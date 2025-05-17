@@ -1,0 +1,122 @@
+---
+description: Data Documentation format
+globs: 
+alwaysApply: false
+---
+# Scraped Documentation Format
+
+This rule defines the format for scraped documentation in Markdown files and storage conventions.
+
+<rule>
+name: scraped-doc-format
+description: Rules for working with scraped documentation in Markdown files
+filters:
+  - type: file_extension
+    pattern: "\\.md$"
+  - type: content
+    pattern: "^----\\n\\nCreated: \\d{4}-\\d{2}-\\d{2}:\\d{2}:\\d{2}\\n"
+
+actions:
+  - type: suggest
+    message: |
+      This file contains scraped documentation in the standard format:
+
+      ```
+      ----
+
+      Created: YYYY-MM-DD:HH:MM:SS (timestamp, only shown once at the top)
+      Extractor: [webdoc|generic] (documentation type extractor used)
+
+      ----
+
+      https://example.com/page (URL)
+
+      ----
+
+      Content of the page
+
+      ----
+
+      https://example.com/next-page (next URL)
+
+      ----
+
+      Content of the next page
+
+      ----
+      ```
+
+      Each documentation section follows this pattern:
+      1. A single metadata section at the top with:
+         - "Created:" timestamp prefix
+         - "Extractor:" documentation type
+      2. Separator lines (`----`) between sections
+      3. URL of the scraped page
+      4. Another separator line
+      5. Content of the scraped page
+      6. Repeat URLs and content for additional pages
+
+      ## Storage Conventions
+
+      Scraped documentation should be stored following these conventions:
+      
+      1. All documentation should be saved in the `/data` directory
+      2. Use subdirectories based on the top-level domain of the source:
+         - For `https://example.com/docs/` → `/data/example_com/`
+         - For `https://pixijs.download/docs/` → `/data/pixijs_download/`
+      3. Use descriptive filenames for the specific documentation section
+      
+      Example directory structure:
+      ```
+      /data/
+      ├── pixijs_download/
+      │   ├── api-reference.md
+      │   ├── getting-started.md
+      │   └── examples.md
+      ├── other_domain_com/
+      │   └── api-reference.md
+      └── ...
+      ```
+
+examples:
+  - input: |
+      ----
+
+      Created: 2025-05-16:08:21:35
+      Extractor: webdoc
+
+      ----
+
+      https://pixijs.download/release/docs/index.html
+
+      ----
+
+      # PixiJS API Documentation
+      
+      This is the main API documentation page.
+
+      ----
+
+      https://pixijs.download/release/docs/getting-started.html
+
+      ----
+
+      # Getting Started
+      
+      This guide will help you get started with PixiJS.
+      
+      ----
+    output: "Valid scraped documentation format with two pages from pixijs.download using webdoc extractor"
+
+  - input: |
+      # Regular Markdown
+      
+      This is just regular markdown content without the proper format.
+    output: "Not in the standardized scraped documentation format"
+
+metadata:
+  priority: medium
+  version: 1.2
+  maintainers:
+    - Script Author
+</rule>
